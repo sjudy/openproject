@@ -620,12 +620,28 @@ class User < Principal
     # Admin users are authorized for anything else
     return true if admin?
 
-    scope = User.where("1=1")
-    @registered_allowance_evaluators.each do |evaluator|
-      scope = scope.merge(evaluator.allowed_in_project_scope(action, project))
+    allowed = allowed_in_project do |evaluator|
+      evaluator.allowed_in_project_scope(action, project)
     end
 
-    scope.count == 1
+    if !allowed && project.is_public?
+
+      allowed = allowed_in_project do |evaluator|
+        evaluator.allowed_user_agnostic_scope(action)
+      end
+    end
+
+    allowed
+  end
+
+  def allowed_in_project(&block)
+    scope = User.where("1=1")
+
+    @registered_allowance_evaluators.each do |evaluator|
+      scope = scope.merge(block.call(evaluator))
+    end
+
+    scope.where(id: id).count == 1
   end
 
   # Is the user allowed to do the specified action on any project?
@@ -635,16 +651,19 @@ class User < Principal
     return true if admin?
 
     initialize_allowance_evaluators
-    # authorize if user has at least one membership granting this permission
-    candidates_for_global_allowance.any? do |candidate|
-      denied = @registered_allowance_evaluators.any? do |evaluator|
-        evaluator.denied_for_global? candidate, action, options
-      end
 
-      !denied && @registered_allowance_evaluators.any? do |evaluator|
-        evaluator.granted_for_global? candidate, action, options
+    allowed = allowed_in_project do |evaluator|
+      evaluator.allowed_globally_scope(action)
+    end
+
+    if !allowed
+
+      allowed = allowed_in_project do |evaluator|
+        evaluator.allowed_user_agnostic_scope(action)
       end
     end
+
+    allowed
   end
 
   # Utility method to help check if a user should be notified about an
