@@ -57,10 +57,11 @@ describe JournalsController do
   describe :edit do
     describe 'authorization' do
       before do
-        work_package.update_attribute :description, 'description'
-        role.add_permission! *permissions
         member.save and user.reload
         allow(User).to receive(:current).and_return user
+
+        work_package.update_attribute :description, 'description'
+        role.add_permission! *permissions
 
         get :edit, id: work_package.journals.last.id
       end
