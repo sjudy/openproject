@@ -67,7 +67,6 @@ Redmine::AccessControl.map do |map|
                  {
                    :types => [:index, :show],
                    :projects => [:show],
-                   :projects => [:show],
                    :activities => [:index]
                  },
                  :public => true
