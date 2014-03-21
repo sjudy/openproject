@@ -27,14 +27,18 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+module Authorization::Condition
+  class PermissionsModuleActive < Base
+    table EnabledModule
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+    # If the permission belongs to a project module,
+    # make sure the module is enabled
+    def arel_statement(permission: nil, **ignored)
+      perm = Redmine::AccessControl.permission(permission)
+
+      if perm.present? && perm.project_module.present?
+        enabled_modules[:name].eq(perm.project_module)
+      end
     end
   end
 end

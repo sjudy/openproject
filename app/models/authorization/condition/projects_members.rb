@@ -27,14 +27,18 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+module Authorization::Condition
+  class ProjectsMembers < Base
+    table Project, :projects
+    table Member, :members
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+    def arel_statement(project: nil, user: nil, **ignored)
+      condition = projects[:id].eq(members[:project_id])
+
+      condition = condition.and(members[:user_id].eq(user.id)) if user.present?
+      condition = condition.and(members[:project_id].eq(project.id)) if project.present?
+
+      condition
     end
   end
 end

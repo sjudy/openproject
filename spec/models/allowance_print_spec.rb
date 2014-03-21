@@ -29,8 +29,8 @@
 
 require 'spec_helper'
 
-describe Allowance, "#print" do
-  let(:klass) { Allowance }
+describe Authorization, "#print" do
+  let(:klass) { Authorization }
   let(:instance) { klass.new }
 
   def clean_print(allowance)
@@ -43,27 +43,27 @@ describe Allowance, "#print" do
   after(:each) do
     # Cleanup created scope so it does not interfere with
     # other tests
-    Allowance.drop_scope(scope_name) if Allowance.respond_to?(scope_name)
+    Authorization.drop_scope(scope_name) if Authorization.respond_to?(scope_name)
   end
 
   describe :print do
     let(:table1) {
       mock_table = double('first_model')
 
-      Class.new(Allowance::Table::Base) { table mock_table }
+      Class.new(Authorization::Table::Base) { table mock_table }
     }
     let(:table2) {
       mock_table = double('second_model')
 
-      Class.new(Allowance::Table::Base) { table mock_table }
+      Class.new(Authorization::Table::Base) { table mock_table }
     }
     let(:condition1) {
-      mock_condition = Class.new(Allowance::Condition::Base) {}
+      mock_condition = Class.new(Authorization::Condition::Base) {}
 
       Object.const_set(:TestCondition1, mock_condition)
     }
     let(:condition2) {
-      mock_condition = Class.new(Allowance::Condition::Base) {}
+      mock_condition = Class.new(Authorization::Condition::Base) {}
 
       Object.const_set(:TestCondition2, mock_condition)
     }
@@ -76,7 +76,7 @@ describe Allowance, "#print" do
     it 'returns the scope_target table if nothing else is defined' do
       first_table = table1
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         table :first, first_table
 
         scope_target first
@@ -90,7 +90,7 @@ describe Allowance, "#print" do
       second_table = table2
       mock_condition = condition1
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         table :first, first_table
         table :second, second_table
 
@@ -111,7 +111,7 @@ describe Allowance, "#print" do
       mock_condition1 = condition1
       mock_condition2 = condition2
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         table :first, first_table
         table :second, second_table
 
@@ -133,7 +133,7 @@ describe Allowance, "#print" do
       mock_condition1 = condition1
       mock_condition2 = condition2
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         table :first, first_table
         table :second, second_table
 
@@ -153,7 +153,7 @@ describe Allowance, "#print" do
       first_table = table1
       mock_condition = condition1
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         table :first, first_table
 
         condition :where_condition, mock_condition
@@ -171,7 +171,7 @@ describe Allowance, "#print" do
       mock_condition1 = condition1
       mock_condition2 = condition2
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         table :first, first_table
 
         condition :where_condition1, mock_condition1
@@ -191,7 +191,7 @@ describe Allowance, "#print" do
       mock_condition1 = condition1
       mock_condition2 = condition2
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         table :first, first_table
 
         condition :where_condition1, mock_condition1

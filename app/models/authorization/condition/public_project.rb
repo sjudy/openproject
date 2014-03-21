@@ -27,14 +27,25 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+module Authorization::Condition
+  class PublicProject < Base
+    table Role, :roles
+    table Project, :projects
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+    def arel_statement(user: nil, **ignored)
+      role_is = if user.nil?
+                  nil
+                elsif user.anonymous?
+                  roles[:id].eq(::Role.anonymous.id)
+                else
+                  roles[:id].eq(::Role.non_member.id)
+                end
+
+      public_project = projects[:is_public].eq(true)
+
+      role_is.nil? ?
+        public_project :
+        projects.grouping(role_is.and(public_project))
     end
   end
 end

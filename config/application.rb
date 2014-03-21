@@ -152,9 +152,9 @@ module OpenProject
     config.action_controller.relative_url_root = OpenProject::Configuration['rails_relative_url_root']
 
     initializer 'load_allowance' do
-      require 'allowance/principals'
-      require 'allowance/users'
-      require 'allowance/project'
+      require 'authorization/principals'
+      require 'authorization/users'
+      require 'authorization/project'
     end
 
     config.to_prepare do

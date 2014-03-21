@@ -27,14 +27,16 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+module Authorization::Condition
+  class AnonymousInProject < Base
+    table User
+    table Role
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+    def arel_statement(**ignored)
+      anonymous_user = users[:id].eq(User.anonymous.id)
+      anonymous_role = roles[:id].eq(Role.anonymous.id)
+
+      users.grouping(anonymous_role.and(anonymous_user))
     end
   end
 end

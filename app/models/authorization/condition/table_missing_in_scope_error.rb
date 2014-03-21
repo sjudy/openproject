@@ -27,14 +27,18 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+module Authorization::Condition
+  class TableMissingInScopeError < ::Exception
+    attr_reader :model,
+                :condition
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+    def initialize(condition, model)
+      @model = model
+      @condition = condition
+    end
+
+    def message
+      "Conditon #{condition} is lacking the table for the #{model} model in it's scope"
     end
   end
 end

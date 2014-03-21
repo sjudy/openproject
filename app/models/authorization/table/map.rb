@@ -27,14 +27,46 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+module Authorization::Table
+  class Map
+    def initialize(scope)
+      self.scope = scope
+    end
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+    def define(name, definition)
+      table_class = definition || Class.new(Base) do
+        table name.to_s.singularize.camelize.constantize
+      end
+
+      new_table = table_class.new(scope)
+
+      add name, new_table
+
+      new_table
+    end
+
+    def has_table?(model)
+      for_model(model).present?
+    end
+
+    def name(table)
+      map[table]
+    end
+
+    private
+
+    attr_accessor :scope
+
+    def add(name, table)
+      map[table] = name
+    end
+
+    def for_model(model)
+      map.keys.detect { |table| table.model == model }
+    end
+
+    def map
+      @map ||= {}
     end
   end
 end

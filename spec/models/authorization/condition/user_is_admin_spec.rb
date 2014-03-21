@@ -27,14 +27,29 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+require 'spec_helper'
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+require_relative 'shared/allows_concatenation'
+
+describe Authorization::Condition::UserIsAdmin do
+
+  include Spec::Authorization::Condition::AllowsConcatenation
+
+  let(:scope) { double('scope', :has_table? => true) }
+  let(:klass) { Authorization::Condition::UserIsAdmin }
+  let(:instance) { klass.new(scope) }
+  let(:users_table) { User.arel_table }
+  let(:nil_options) { { admin_pass: false } }
+  let(:non_nil_options) { { admin_pass: true } }
+  let(:non_nil_arel) { users_table[:admin].eq(true) }
+
+  it_should_behave_like "allows concatenation"
+  it_should_behave_like "requires models", User
+
+  describe :to_arel do
+    it 'returns an arel statement if noting is passed (admin_pass true by default)' do
+      expect(instance.to_arel.to_sql).to eq non_nil_arel.to_sql
     end
   end
 end
+

@@ -139,7 +139,7 @@ module User::Allowed
 
   module ClassMethods
     def allowed(action = nil, context = nil, admin_pass: true)
-      Allowance.users(project: context, permission: action, admin_pass: admin_pass)
+      Authorization.users(project: context, permission: action, admin_pass: admin_pass)
     end
   end
 end

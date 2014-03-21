@@ -125,7 +125,7 @@ class TimeEntry < ActiveRecord::Base
 private
 
   def self.users_entries(user, project = nil)
-    scope = TimeEntry.joins(:project).merge(Allowance.projects(permission: :view_time_entries, user: user))
+    scope = TimeEntry.joins(:project).merge(Authorization.projects(permission: :view_time_entries, user: user))
     if project
       scope = scope.where(["#{self.table_name}.project_id IN (?)", project.hierarchy.collect(&:id)])
     end

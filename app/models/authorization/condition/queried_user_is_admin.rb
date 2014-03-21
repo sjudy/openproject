@@ -27,14 +27,12 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
-
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+module Authorization::Condition
+  class QueriedUserIsAdmin < Base
+    def arel_statement(user: nil, admin_pass: true, **ignored)
+      if user && user.admin? && admin_pass
+        Arel::Nodes::Equality.new(1, 1)
+      end
     end
   end
 end

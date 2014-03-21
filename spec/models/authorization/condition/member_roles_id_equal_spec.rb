@@ -27,14 +27,23 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+require 'spec_helper'
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
-    end
-  end
+require_relative 'shared/allows_concatenation'
+
+describe Authorization::Condition::MemberRolesIdEqual do
+
+  include Spec::Authorization::Condition::AllowsConcatenation
+
+
+  let(:scope) { double('scope', :has_table? => true) }
+  let(:klass) { Authorization::Condition::MemberRolesIdEqual }
+  let(:instance) { klass.new(scope) }
+  let(:member_roles_table) { MemberRole.arel_table }
+  let(:members_table) { Member.arel_table }
+  let(:non_nil_options) { {} }
+  let(:non_nil_arel) { member_roles_table[:member_id].eq(members_table[:id]) }
+
+  it_should_behave_like "allows concatenation"
+  it_should_behave_like "requires models", Member, MemberRole
 end

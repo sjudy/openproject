@@ -27,14 +27,14 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+module Authorization::Condition
+  class UserIsAdmin < Base
+    table User
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+    def arel_statement(admin_pass: true, **ignored)
+      if admin_pass
+        users[:admin].eq(true)
+      end
     end
   end
 end

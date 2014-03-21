@@ -27,14 +27,39 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+module Authorization::Condition
+  class Map
+    def initialize(scope)
+      self.scope = scope
+    end
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+    def define(name, definition, only_if: nil)
+      instance = instance_of(definition, only_if: only_if)
+
+      add name, instance
+
+      instance
+    end
+
+    private
+
+    attr_accessor :scope
+
+    def add(name, condition)
+      map[condition] = name
+    end
+
+    def instance_of(definition, only_if: nil)
+      if definition.is_a?(Class)
+        definition.new(scope, only_if: only_if)
+      else
+        definition.if = only_if
+        definition
+      end
+    end
+
+    def map
+      @map ||= {}
     end
   end
 end

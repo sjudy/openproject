@@ -29,8 +29,8 @@
 
 require 'spec_helper'
 
-describe Allowance do
-  let(:klass) { Allowance }
+describe Authorization do
+  let(:klass) { Authorization }
   let(:instance) { klass.new }
 
   let(:scope_name) { :test_scope }
@@ -38,42 +38,42 @@ describe Allowance do
   after(:each) do
     # Cleanup created scope so it does not interfere with
     # other tests
-    Allowance.drop_scope(scope_name) if Allowance.respond_to?(scope_name)
+    Authorization.drop_scope(scope_name) if Authorization.respond_to?(scope_name)
   end
 
   describe :scope do
 
-    it 'adds a method on Allowance' do
-      expect(Allowance.respond_to?(scope_name)).to be_false
+    it 'adds a method on Authorization' do
+      expect(Authorization.respond_to?(scope_name)).to be_false
 
-      Allowance.scope(scope_name) {}
+      Authorization.scope(scope_name) {}
 
-      expect(Allowance.respond_to?(scope_name)).to be_true
+      expect(Authorization.respond_to?(scope_name)).to be_true
     end
 
-    it 'returns a new Allowance instance' do
-      expect(Allowance.scope(scope_name) {}).to be_a(Allowance)
+    it 'returns a new Authorization instance' do
+      expect(Authorization.scope(scope_name) {}).to be_a(Authorization)
     end
 
     it 'evaluates the passed block within a new allowance object' do
       instance = nil
 
-      Allowance.scope(scope_name) do
+      Authorization.scope(scope_name) do
         instance = self
       end
 
-      expect(instance).to be_a(Allowance)
+      expect(instance).to be_a(Authorization)
     end
 
     it 'returns the same allowance instance if called twice' do
       instance1 = nil
       instance2 = nil
 
-      Allowance.scope(scope_name) do
+      Authorization.scope(scope_name) do
         instance1 = self
       end
 
-      Allowance.scope(scope_name) do
+      Authorization.scope(scope_name) do
         instance2 = self
       end
 
@@ -83,19 +83,19 @@ describe Allowance do
 
   describe :drop_scope do
     it 'removes the defined scope' do
-      Allowance.scope(scope_name) {}
+      Authorization.scope(scope_name) {}
 
-      Allowance.drop_scope(scope_name)
+      Authorization.drop_scope(scope_name)
 
-      expect(Allowance.respond_to?(scope_name)).to be_false
+      expect(Authorization.respond_to?(scope_name)).to be_false
     end
   end
 
   describe :condition do
     it 'creates a method that returns an instance of the specified condition class' do
-      klass = Class.new(Allowance::Condition::Base) {}
+      klass = Class.new(Authorization::Condition::Base) {}
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :my_condition, klass
       end
 
@@ -105,8 +105,8 @@ describe Allowance do
     it 'creates a method that returns the provided instance' do
       instance = nil
 
-      allowance = Allowance.scope(scope_name) do
-        instance = (Class.new(Allowance::Condition::Base) {}).new(self)
+      allowance = Authorization.scope(scope_name) do
+        instance = (Class.new(Authorization::Condition::Base) {}).new(self)
 
         condition :my_condition, instance
       end
@@ -117,7 +117,7 @@ describe Allowance do
 
   describe :has_table? do
     it 'should be true if the table is defined in the scope' do
-      test_scope = Allowance.scope scope_name do
+      test_scope = Authorization.scope scope_name do
         table :users
       end
 
@@ -125,7 +125,7 @@ describe Allowance do
     end
 
     it 'should be false if the table is not defined in the scope' do
-      test_scope = Allowance.scope scope_name do
+      test_scope = Authorization.scope scope_name do
       end
 
       test_scope.has_table?(User).should be_false

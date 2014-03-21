@@ -27,14 +27,16 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+module Authorization::Condition
+  class ActiveNonMemberInProject < Base
+    table User
+    table Role
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+    def arel_statement(project: nil, **ignored)
+      active_user = users[:status].eq(::User::STATUSES[:active])
+      non_member_role = roles[:id].eq(Role.non_member.id)
+
+      users.grouping(non_member_role.and(active_user))
     end
   end
 end

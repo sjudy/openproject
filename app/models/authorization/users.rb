@@ -27,14 +27,11 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+require 'authorization'
+require 'authorization/principals'
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
-    end
+class Authorization
+  def self.users(options = {})
+    User.unscoped.merge(self.principals(options))
   end
 end

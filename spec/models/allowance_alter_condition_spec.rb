@@ -29,8 +29,8 @@
 
 require 'spec_helper'
 
-describe Allowance, '#alter_condition' do
-  let(:klass) { Allowance }
+describe Authorization, '#alter_condition' do
+  let(:klass) { Authorization }
   let(:instance) { klass.new }
 
   def clean_print(allowance)
@@ -43,32 +43,32 @@ describe Allowance, '#alter_condition' do
   after(:each) do
     # Cleanup created scope so it does not interfere with
     # other tests
-    Allowance.drop_scope(scope_name) if Allowance.respond_to?(scope_name)
+    Authorization.drop_scope(scope_name) if Authorization.respond_to?(scope_name)
   end
 
   describe :alter_condition do
     let(:table1) {
       mock_table = double('first_model')
 
-      Class.new(Allowance::Table::Base) { table mock_table }
+      Class.new(Authorization::Table::Base) { table mock_table }
     }
     let(:table2) {
       mock_table = double('second_model')
 
-      Class.new(Allowance::Table::Base) { table mock_table }
+      Class.new(Authorization::Table::Base) { table mock_table }
     }
     let(:condition1) {
-      mock_condition = Class.new(Allowance::Condition::Base) {}
+      mock_condition = Class.new(Authorization::Condition::Base) {}
 
       Object.const_set(:TestCondition1, mock_condition)
     }
     let(:condition2) {
-      mock_condition = Class.new(Allowance::Condition::Base) {}
+      mock_condition = Class.new(Authorization::Condition::Base) {}
 
       Object.const_set(:TestCondition2, mock_condition)
     }
     let(:condition3) {
-      mock_condition = Class.new(Allowance::Condition::Base) {}
+      mock_condition = Class.new(Authorization::Condition::Base) {}
 
       Object.const_set(:TestCondition3, mock_condition)
     }
@@ -84,7 +84,7 @@ describe Allowance, '#alter_condition' do
       new_condition = condition2
       first_table = table1
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :my_condition, orig_condition
 
         table :first, first_table
@@ -102,7 +102,7 @@ describe Allowance, '#alter_condition' do
       orig_condition = condition1
       new_condition = condition2
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :my_condition, orig_condition
 
         table :first, first_table
@@ -125,7 +125,7 @@ describe Allowance, '#alter_condition' do
       orig_condition = condition1
       new_condition = condition2
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :my_condition, orig_condition
         condition :replacement_condition, new_condition
 
@@ -148,7 +148,7 @@ describe Allowance, '#alter_condition' do
       orig_condition = condition1
       new_condition = condition2
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :where_condition, orig_condition
 
         table :first, first_table
@@ -169,7 +169,7 @@ describe Allowance, '#alter_condition' do
       new_condition = condition2
       other_condition = condition3
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :where_condition, orig_condition
         condition :a_condition, other_condition
         condition :concat, where_condition.and(a_condition)
@@ -192,7 +192,7 @@ describe Allowance, '#alter_condition' do
       new_condition = condition2
       other_condition = condition3
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :where_condition, orig_condition
         condition :a_condition, other_condition
         condition :concat, where_condition.or(a_condition)
@@ -215,7 +215,7 @@ describe Allowance, '#alter_condition' do
       new_condition = condition2
       other_condition = condition3
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :where_condition, orig_condition
         condition :a_condition, other_condition
         condition :concat, where_condition.or(a_condition)
@@ -238,7 +238,7 @@ describe Allowance, '#alter_condition' do
       new_condition = condition2
       other_condition = condition3
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :where_condition, orig_condition
         condition :a_condition, other_condition
         condition :concat, where_condition.and(a_condition)
@@ -262,7 +262,7 @@ describe Allowance, '#alter_condition' do
       new_condition = condition2
       other_condition = condition3
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :where_condition, orig_condition
         condition :a_condition, other_condition
         condition :concat, where_condition.and(a_condition)
@@ -288,7 +288,7 @@ describe Allowance, '#alter_condition' do
       new_condition = condition2
       other_condition = condition3
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :where_condition, orig_condition
         condition :a_condition, other_condition
         condition :concat, where_condition.or(a_condition)
@@ -315,7 +315,7 @@ describe Allowance, '#alter_condition' do
       new_condition = condition2
       other_condition = condition3
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :join_condition, other_condition
         condition :a_condition, orig_condition
 
@@ -339,7 +339,7 @@ describe Allowance, '#alter_condition' do
       new_condition = condition2
       other_condition = condition3
 
-      allowance = Allowance.scope(scope_name) do
+      allowance = Authorization.scope(scope_name) do
         condition :where_condition, other_condition
         condition :a_condition, orig_condition
 

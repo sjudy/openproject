@@ -27,14 +27,36 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
+require 'spec_helper'
+
+require_relative 'shared/allows_concatenation'
+
+describe Authorization::Condition::AnonymousInProject do
+
+  include Spec::Authorization::Condition::AllowsConcatenation
+
+
+  let(:scope) { double('scope', :has_table? => true) }
+  let(:klass) { Authorization::Condition::AnonymousInProject }
+  let(:instance) { klass.new(scope) }
+  let(:users_table) { User.arel_table }
+  let(:roles_table) { Role.arel_table }
+  let(:non_nil_options) { { project: double('project', is_public?: true) } }
+  let(:non_nil_arel) do
+    anonymous_user = users_table[:id].eq(User.anonymous.id)
+    anonymous_role = roles_table[:id].eq(Role.anonymous.id)
+
+    anonymous = anonymous_role.and(anonymous_user)
+
+    users_table.grouping(anonymous)
   end
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+  it_should_behave_like "allows concatenation"
+  it_should_behave_like "requires models", Role, User
+
+  describe :to_arel do
+    it 'returns an arel to find anonymous (non member) if no project is provided' do
+      expect(instance.to_arel.to_sql).to eq(non_nil_arel.to_sql)
     end
   end
 end

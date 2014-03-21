@@ -27,14 +27,37 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
+require 'spec_helper'
+
+require_relative 'shared/allows_concatenation'
+
+describe Authorization::Condition::ActiveNonMemberInProject do
+
+  include Spec::Authorization::Condition::AllowsConcatenation
+
+
+  let(:scope) { double('scope', :has_table? => true) }
+  let(:klass) { Authorization::Condition::ActiveNonMemberInProject }
+  let(:instance) { klass.new(scope) }
+  let(:members_table) { Member.arel_table }
+  let(:users_table) { User.arel_table }
+  let(:roles_table) { Role.arel_table }
+  let(:non_nil_options) { { project: double('project', is_public?: true) } }
+  let(:non_nil_arel) do
+    active_user = users_table[:status].eq(::User::STATUSES[:active])
+    non_member_role = roles_table[:id].eq(Role.non_member.id)
+
+    active_non_member = non_member_role.and(active_user)
+
+    members_table.grouping(active_non_member)
   end
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+  it_should_behave_like "allows concatenation"
+  it_should_behave_like "requires models", Role, User
+
+  describe :to_arel do
+    it 'returns an arel to find active non members if no project is provided' do
+      expect(instance.to_arel.to_sql).to eq(non_nil_arel.to_sql)
     end
   end
 end

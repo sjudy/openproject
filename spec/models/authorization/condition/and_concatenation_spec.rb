@@ -27,14 +27,16 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+require 'spec_helper'
+require_relative 'shared/concatenation'
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
-    end
-  end
+describe Authorization::Condition::AndConcatenation do
+  let(:first_condition) { double('first_condition') }
+  let(:second_condition) { double('second_condition') }
+  let(:scope) { double('scope') }
+
+  let(:instance) { Authorization::Condition::AndConcatenation.new(scope, first_condition, second_condition) }
+
+  it_should_behave_like 'has first and second condition'
+  it_should_behave_like 'concatenates arel', :and
 end

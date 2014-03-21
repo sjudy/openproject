@@ -27,14 +27,33 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module Project::AllowedScope
-  def self.included(base)
-    base.extend ClassMethods
-  end
+require 'spec_helper'
 
-  module ClassMethods
-    def allowed(user, permission = nil)
-      Authorization.projects(user: user, permission: permission)
+require_relative 'shared/allows_concatenation'
+
+describe Authorization::Condition::UsersMemberships do
+
+  include Spec::Authorization::Condition::AllowsConcatenation
+
+
+  let(:scope) { double('scope', :has_table? => true) }
+  let(:klass) { Authorization::Condition::UsersMemberships }
+  let(:instance) { klass.new(scope) }
+  let(:users_table) { User.arel_table }
+  let(:members_table) { Member.arel_table }
+  let(:non_nil_options) { {} }
+  let(:non_nil_arel) { users_table[:id].eq(members_table[:user_id]) }
+
+  it_should_behave_like "allows concatenation"
+  it_should_behave_like "requires models", User, Member
+
+  describe :to_arel do
+    it 'limits the returned arel to the provided project if provided' do
+      project = double('project', id: 567)
+
+      expected = non_nil_arel.and(members_table[:project_id].eq(project.id)).to_sql
+
+      expect(instance.to_arel(project: project).to_sql).to eql(expected)
     end
   end
 end
