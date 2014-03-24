@@ -29,22 +29,25 @@
 require 'spec_helper'
 require Rails.root + 'spec/models/shared/authorization'
 
-describe News, "authorization" do
+describe Changeset, "authorization" do
   include Spec::Models::Shared::Authorization
 
-  let(:created_news) { FactoryGirl.create(:news,
-                                          :project => project,
-                                          :author => user) }
-  let(:project) { FactoryGirl.create(:project) }
+  let(:created_changeset) { FactoryGirl.create(:changeset,
+                                               repository: repository,
+                                               :user => user) }
+  let(:project) { repository.project }
+  let(:repository) { FactoryGirl.create(:repository) }
   let(:user) { FactoryGirl.create(:user) }
   let(:role) { FactoryGirl.build(:role, :permissions => [ ]) }
   let(:member) { FactoryGirl.build(:member, :project => project,
                                             :roles => [role],
                                             :principal => user) }
 
-  it_should_behave_like "needs authorization for viewing", klass: News,
-                                                           instance: :created_news,
-                                                           permission: :view_news,
+  before { Setting.stub(:enabled_scm).and_return(['Filesystem']) }
+
+  it_should_behave_like "needs authorization for viewing", klass: Changeset,
+                                                           instance: :created_changeset,
+                                                           permission: :view_changesets,
                                                            role: :role,
                                                            member: :member,
                                                            user: :user

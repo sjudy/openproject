@@ -29,40 +29,22 @@
 require 'spec_helper'
 require Rails.root + 'spec/models/shared/authorization'
 
-describe Message, "authorization" do
+describe Board, "authorization" do
   include Spec::Models::Shared::Authorization
 
-  let(:created_message) { FactoryGirl.create(:message, :author => user) }
-  let(:board) { created_message.board }
-  let(:project) { board.project }
+  let(:created_board) { FactoryGirl.create(:board,
+                                           :project => project) }
+  let(:project) { FactoryGirl.create(:project) }
   let(:user) { FactoryGirl.create(:user) }
   let(:role) { FactoryGirl.build(:role, :permissions => [ ]) }
   let(:member) { FactoryGirl.build(:member, :project => project,
                                             :roles => [role],
                                             :principal => user) }
 
-  it_should_behave_like "needs authorization for viewing", klass: Message,
-                                                           instance: :created_message,
+  it_should_behave_like "needs authorization for viewing", klass: Board,
+                                                           instance: :created_board,
                                                            permission: :view_messages,
                                                            role: :role,
                                                            member: :member,
                                                            user: :user
-
-  it_should_behave_like "needs authorization for editing", klass: Message,
-                                                           instance: :created_message,
-                                                           permission: :edit_messages,
-                                                           own_permission: :edit_own_messages,
-                                                           role: :role,
-                                                           member: :member,
-                                                           user: :user,
-                                                           user_attribute: :author
-
-  it_should_behave_like "needs authorization for deleting", klass: Message,
-                                                            instance: :created_message,
-                                                            permission: :delete_messages,
-                                                            own_permission: :delete_own_messages,
-                                                            role: :role,
-                                                            member: :member,
-                                                            user: :user,
-                                                            user_attribute: :author
 end

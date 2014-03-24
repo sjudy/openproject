@@ -51,8 +51,9 @@ class Version < ActiveRecord::Base
   validate :validate_start_date_before_effective_date
 
   scope :open, :conditions => {:status => 'open'}
-  scope :visible, lambda {|*args| { :include => :project,
-                                    :conditions => Project.allowed_to_condition(args.first || User.current, :view_work_packages) } }
+
+  include OpenProject::NeedsAuthorization::NeedsAuthorization
+  needs_authorization view: :view_messages
 
   safe_attributes 'name',
     'description',
@@ -63,11 +64,6 @@ class Version < ActiveRecord::Base
     'status',
     'sharing',
     'custom_field_values'
-
-  # Returns true if +user+ or current user is allowed to view the version
-  def visible?(user=User.current)
-    user.allowed_to?(:view_work_packages, self.project)
-  end
 
   # When a version started.
   #

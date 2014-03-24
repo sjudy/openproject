@@ -75,19 +75,27 @@ module OpenProject::NeedsAuthorization
 
     module InstanceMethods
       def editable?(usr)
-        edit_permission = self.class.authorization_options[:edit]
-        edit_own_permission = self.class.authorization_options[:edit_own]
-
-        usr.allowed_to?(edit_permission, project) ||
-        usr.allowed_to?(edit_own_permission, project) && self.user_id == usr.id
+        allowed_on_object?(usr, :edit, true)
       end
 
       def visible?(usr)
-        # TODO: project has to changed so that other associations are possible
-        usr.allowed_to?(self.class.authorization_options[:view], authorization_project)
+        allowed_on_object?(usr, :view)
+      end
+
+      def deletable?(usr)
+        allowed_on_object?(usr, :delete, true)
       end
 
       protected
+
+      def allowed_on_object?(usr, action, own = false)
+        # TODO: project has to changed so that other associations are possible
+        permission = self.class.authorization_options[action]
+        own_permission = self.class.authorization_options["#{action}_own".to_sym]
+
+        usr.allowed_to?(permission, project) ||
+        usr.allowed_to?(own_permission, project) && self.send(authorization_own_association) == usr.id
+      end
 
       def authorization_project
         case self.authorization_project_association
@@ -108,6 +116,14 @@ module OpenProject::NeedsAuthorization
 
       def authorization_project_association
         authorization_options[:project_association] || :project
+      end
+
+      def authorization_own_association
+        authorization_options[:own_association] || :user_id
+      end
+
+      def own_id
+        self.send(authorization_own_association)
       end
 
       def navigate_to_project(path)

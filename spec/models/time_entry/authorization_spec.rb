@@ -27,8 +27,11 @@
 #++
 
 require 'spec_helper'
+require Rails.root + 'spec/models/shared/authorization'
 
 describe TimeEntry, "authorization" do
+  include Spec::Models::Shared::Authorization
+
   let(:created_time_entry) { FactoryGirl.create(:time_entry,
                                                 :project => project,
                                                 :user => user,
@@ -45,50 +48,18 @@ describe TimeEntry, "authorization" do
                                          :status => status) }
   let(:status) { FactoryGirl.create(:status) }
 
-  describe :visible do
-    it "should be visible if user has the view_time_entry permission in the project" do
-      role.permissions = [:view_time_entries]
-      member.save!
+  it_should_behave_like "needs authorization for viewing", klass: TimeEntry,
+                                                           instance: :created_time_entry,
+                                                           permission: :view_time_entries,
+                                                           role: :role,
+                                                           member: :member,
+                                                           user: :user
 
-      expect(TimeEntry.visible(user)).to match_array([created_time_entry])
-    end
-
-    it "should not be visible if user lacks the view_time_entry permission in the project" do
-      created_time_entry
-
-      expect(TimeEntry.visible(user)).to match_array([])
-    end
-  end
-
-  describe :editable? do
-    it "should be editable if user has the edit_time_entries permission in the project" do
-      role.permissions = [:edit_time_entries]
-      member.save!
-
-      expect(created_time_entry.editable?(user)).to be_true
-    end
-
-    it "should not be editable if user lacks the edit_time_entries permission in the project" do
-      created_time_entry
-
-      expect(created_time_entry.editable?(user)).to be_false
-    end
-
-    it "should be editable if user has the edit_own_time_entries permission in the project and the time entry belongs to the user" do
-      role.permissions = [:edit_own_time_entries]
-      member.save!
-
-      expect(created_time_entry.editable?(user)).to be_true
-    end
-
-    it "should not be editable if user has the edit_own_time_entries permission in the project and the time entry belongs to a different user" do
-      role.permissions = [:edit_own_time_entries]
-      member.save!
-
-      created_time_entry.user = FactoryGirl.create(:user)
-      created_time_entry.save!
-
-      expect(created_time_entry.editable?(user)).to be_false
-    end
-  end
+  it_should_behave_like "needs authorization for editing", klass: TimeEntry,
+                                                           instance: :created_time_entry,
+                                                           permission: :edit_time_entries,
+                                                           own_permission: :edit_own_time_entries,
+                                                           role: :role,
+                                                           member: :member,
+                                                           user: :user
 end

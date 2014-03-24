@@ -36,15 +36,19 @@ class Board < ActiveRecord::Base
   belongs_to :last_message, :class_name => 'Message', :foreign_key => :last_message_id
   acts_as_list :scope => :project_id
   acts_as_watchable
-  
+
   attr_protected :project_id
 
   validates_presence_of :name, :description
   validates_length_of :name, :maximum => 30
   validates_length_of :description, :maximum => 255
 
+  include OpenProject::NeedsAuthorization::NeedsAuthorization
+  needs_authorization view: :view_messages
+
   def visible?(user=User.current)
-    !user.nil? && user.allowed_to?(:view_messages, project)
+    # TODO: remove once usages of lazy User.current are removed
+    super(user)
   end
 
   def to_s
