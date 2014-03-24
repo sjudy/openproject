@@ -90,17 +90,17 @@ module User::Allowed
 
     def allowed_to_in_project?(action, project, options = {})
       # No action allowed on archived projects
-      return false unless project.active?
+      #return false unless project.active?
       # No action allowed on disabled modules
 
-      case action
-      when Symbol
-        return false unless project.allows_to?(action)
-      when Array
-        action = action.select { |a| project.allows_to?(a) }
+      #case action
+      #when Symbol
+      ##  return false unless project.allows_to?(action)
+      #when Array
+      #  action = action.select { |a| project.allows_to?(a) }
 
-        return false if action.empty?
-      end
+      #  return false if action.empty?
+      #end
 
       allowed_in_context(action, project)
     end
