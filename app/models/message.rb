@@ -70,18 +70,15 @@ class Message < ActiveRecord::Base
   after_update :update_ancestors
   after_destroy :reset_counters
 
-  scope :visible, lambda {|*args| { :include => {:board => :project},
-                                    :conditions => Project.allowed_to_condition(args.first || User.current, :view_messages) } }
+  include OpenProject::NeedsAuthorization::NeedsAuthorization
+  needs_authorization view: :view_messages,
+                      project_association: { :board => :project }
 
   safe_attributes 'subject', 'content', 'board_id'
   safe_attributes 'locked', 'sticky',
     :if => lambda {|message, user|
       user.allowed_to?(:edit_messages, message.project)
     }
-
-  def visible?(user=User.current)
-    !user.nil? && user.allowed_to?(:view_messages, project)
-  end
 
   validate :validate_unlocked_root, :on => :create
 
