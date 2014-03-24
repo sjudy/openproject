@@ -27,24 +27,6 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-#   SELECT
-#   	"users".login,
-#   	"roles".name,
-#   	"roles".permissions
-#   FROM "users"
-#   LEFT OUTER JOIN "members"
-#   	ON "users"."id" = "members"."user_id" AND "users"."type" = 'User' AND "members"."project_id" = 5
-#   LEFT OUTER JOIN "member_roles"
-#   	ON "member_roles"."member_id" = "members"."id"
-#   LEFT OUTER JOIN "roles"
-#   	ON (
-#   		"members"."project_id" IS NULL AND "roles"."id" = 2 AND "users"."id" = 9998) /* Anonymous */
-#   		OR ("members"."project_id" IS NOT NULL AND "member_roles"."role_id" = "roles"."id") /* member in project */
-#   		OR ("members"."project_id" IS NULL AND "roles"."id" = 1 AND "users"."type" = 'User' ) /* non member */
-#   WHERE "users"."type" IN ('User', 'AnonymousUser', 'DeletedUser')
-#   AND "users"."id" = 5170 /* 5170 */
-#   AND "roles".permissions IS NOT NULL
-
 module User::Allowed
   def self.included(base)
     base.extend(ClassMethods)
@@ -89,19 +71,6 @@ module User::Allowed
     end
 
     def allowed_to_in_project?(action, project, options = {})
-      # No action allowed on archived projects
-      #return false unless project.active?
-      # No action allowed on disabled modules
-
-      #case action
-      #when Symbol
-      ##  return false unless project.allows_to?(action)
-      #when Array
-      #  action = action.select { |a| project.allows_to?(a) }
-
-      #  return false if action.empty?
-      #end
-
       allowed_in_context(action, project)
     end
 
@@ -143,34 +112,3 @@ module User::Allowed
     end
   end
 end
-#   SELECT
-#   	"users".login,
-#   	"roles".name,
-#   	"roles".permissions
-#   FROM "users"
-#   LEFT OUTER JOIN "members"
-#   	ON "users"."id" = "members"."user_id" AND "users"."type" = 'User' AND "members"."project_id" = 5
-#   LEFT OUTER JOIN "member_roles"
-#   	ON "member_roles"."member_id" = "members"."id"
-#   LEFT OUTER JOIN "roles"
-#   	ON (
-#   		"members"."project_id" IS NULL AND "roles"."id" = 2 AND "users"."id" = 9998) /* Anonymous */
-#   		OR ("members"."project_id" IS NOT NULL AND "member_roles"."role_id" = "roles"."id") /* member in project */
-#   		OR ("members"."project_id" IS NULL AND "roles"."id" = 1 AND "users"."type" = 'User' ) /* non member */
-#   WHERE "users"."type" IN ('User', 'AnonymousUser', 'DeletedUser')
-#   AND "users"."id" = 5170 /* 5170 */
-#   AND "roles".permissions IS NOT NULL
-#
-#
-#   SELECT "users".* FROM "users"
-#   LEFT OUTER JOIN "members"
-#     ON "users"."id" = "members"."user_id" AND "users"."type" = 'User' AND "members"."project_id" = 185
-#   LEFT OUTER JOIN "member_roles"
-#     ON "member_roles"."member_id" = "members"."id"
-#   LEFT OUTER JOIN "roles"
-#     ON ((("members"."project_id" IS NOT NULL AND "member_roles"."role_id" = "roles"."id") /* member in project */
-#     OR ("members"."project_id" IS NOT NULL AND "roles"."id" = 467 AND "users"."type" = 'User')) /* non member */
-#     OR ("members"."project_id" IS NULL AND "roles"."id" = 469 AND "users"."id" = 471)) /* Anonymous */
-#   WHERE "users"."type" IN ('User', 'AnonymousUser', 'DeletedUser', 'SystemUser')
-#   AND "users"."id" = 469
-#   AND ("roles"."permissions" IS NOT NULL)
