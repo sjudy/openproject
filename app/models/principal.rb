@@ -70,8 +70,6 @@ class Principal < ActiveRecord::Base
 
   scope :visible_by, lambda { |principal| Principal.visible_by_condition(principal) }
 
-  scope :order_by_name, -> { order(User::USER_FORMATS_STRUCTURE[Setting.user_format]) }
-
   before_create :set_default_empty_values
 
   def name(formatter = nil)
@@ -94,6 +92,10 @@ class Principal < ActiveRecord::Base
     project_ids = principal.projects.pluck(:id)
     self.where("id IN (select m.user_id FROM members AS m WHERE (m.project_id IN (?)))",
                project_ids)
+  end
+
+  def self.order_by_name
+    order(User::USER_FORMATS_STRUCTURE[Setting.user_format])
   end
 
   def self.select_only_name_attributes
