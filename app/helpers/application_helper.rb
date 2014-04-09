@@ -808,7 +808,7 @@ module ApplicationHelper
                                                      :class => 'attachment'
             end
           when 'project'
-            if p = Project.visible.find(:first, :conditions => ["identifier = :s OR LOWER(name) = :s", {:s => name.downcase}])
+            if p = Project.visible.where(["#{Project.table_name}.identifier = :s OR LOWER(#{Project.table_name}.name) = :s", {:s => name.downcase}]).first
               link = link_to_project(p, {:only_path => only_path}, :class => 'project')
             end
           end
