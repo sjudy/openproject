@@ -95,7 +95,7 @@ class Principal < ActiveRecord::Base
   end
 
   def self.order_by_name
-    order(User::USER_FORMATS_STRUCTURE[Setting.user_format])
+    order(User::USER_FORMATS_STRUCTURE[Setting.user_format].map(&:to_s))
   end
 
   def self.select_only_name_attributes
