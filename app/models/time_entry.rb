@@ -48,7 +48,6 @@ class TimeEntry < ActiveRecord::Base
                 author: :user,
                 description: :comments
 
-  include OpenProject::NeedsAuthorization::NeedsAuthorization
   needs_authorization view: :view_time_entries,
                       edit: :edit_time_entries,
                       edit_own: :edit_own_time_entries

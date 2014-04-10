@@ -50,7 +50,6 @@ class News < ActiveRecord::Base
 
   after_create :add_author_as_watcher
 
-  include OpenProject::NeedsAuthorization::NeedsAuthorization
   needs_authorization view: :view_news
 
   safe_attributes 'title', 'summary', 'description'

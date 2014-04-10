@@ -70,7 +70,6 @@ class Message < ActiveRecord::Base
   after_update :update_ancestors
   after_destroy :reset_counters
 
-  include OpenProject::NeedsAuthorization::NeedsAuthorization
   needs_authorization view: :view_messages,
                       edit: :edit_messages,
                       edit_own: :edit_own_messages,

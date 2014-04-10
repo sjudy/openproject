@@ -52,7 +52,6 @@ class Changeset < ActiveRecord::Base
   validates_uniqueness_of :revision, :scope => :repository_id
   validates_uniqueness_of :scmid, :scope => :repository_id, :allow_nil => true
 
-  include OpenProject::NeedsAuthorization::NeedsAuthorization
   needs_authorization view: :view_changesets,
                       project_association: { :repository => :project }
 

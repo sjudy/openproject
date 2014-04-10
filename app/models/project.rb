@@ -110,7 +110,6 @@ class Project < ActiveRecord::Base
   scope :active, lambda { |*args| where(:status => STATUS_ACTIVE) }
   scope :public, lambda { |*args| where(:is_public => true) }
 
-  include OpenProject::NeedsAuthorization::NeedsAuthorization
   needs_authorization view: :view_project,
                       project_association: self
 

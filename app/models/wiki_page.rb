@@ -73,7 +73,6 @@ class WikiPage < ActiveRecord::Base
     { conditions: {wiki_id: wiki_id, parent_id: nil} }
   }
 
-  include OpenProject::NeedsAuthorization::NeedsAuthorization
   needs_authorization view: :view_wiki_pages,
                       project_association: { :wiki => :project }
 
