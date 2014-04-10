@@ -46,11 +46,6 @@ class Board < ActiveRecord::Base
   include OpenProject::NeedsAuthorization::NeedsAuthorization
   needs_authorization view: :view_messages
 
-  def visible?(user=User.current)
-    # TODO: remove once usages of lazy User.current are removed
-    super(user)
-  end
-
   def to_s
     name
   end

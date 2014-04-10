@@ -55,12 +55,6 @@ class News < ActiveRecord::Base
 
   safe_attributes 'title', 'summary', 'description'
 
-  # TODO: remove by checking that nothing relies on the
-  # lazy User.current value
-  def visible?(user=User.current)
-    super(user)
-  end
-
   # returns latest news for projects visible by user
   def self.latest(user = User.current, count = 5)
     visible(user).limit(count)

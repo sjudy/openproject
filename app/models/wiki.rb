@@ -54,11 +54,6 @@ class Wiki < ActiveRecord::Base
   include OpenProject::NeedsAuthorization::NeedsAuthorization
   needs_authorization view: :view_wiki_pages
 
-  def visible?(user=User.current)
-    # TODO: remove once lazy User.current is no longer used
-    super(user)
-  end
-
   # Returns the wiki page that acts as the sidebar content
   # or nil if no such page exists
   def sidebar
