@@ -42,6 +42,14 @@ module OpenProject::NeedsAuthorization
 
           self.include(InstanceMethods)
           self.extend(ClassMethods)
+          # This here will naturally have to be removed.
+          # It includes methods that are of the signature
+          #
+          # def method_name(user = User.current)
+          #
+          # Once calls depending on this lazyness are removed
+          # this can be removed as well
+          self.include(DeprecatedMethods)
         end
       end
     end

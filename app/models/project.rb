@@ -198,11 +198,6 @@ class Project < ActiveRecord::Base
     projects
   end
 
-  def visible?(user = User.current)
-    # TODO: remove once the lazy User.current parameter is removed
-    super(user)
-  end
-
   def allows_association?
     if self.project_type.present?
       self.project_type.allows_association
