@@ -71,19 +71,21 @@ module User::Allowed
     end
 
     def allowed_to_in_project?(action, project, options = {})
+      return false unless project.active?
+      return true if self.admin?
+
       allowed_in_context(action, project)
     end
 
     # Is the user allowed to do the specified action on any project?
     # See allowed_to? for the actions and valid options.
     def allowed_to_globally?(action, options = {})
+      return true if self.admin?
+
       allowed_in_context(action, nil)
     end
 
     def allowed_in_context(action, project)
-
-      return true if self.admin?
-
       permissions = allowance_cache.fetch(project) do
         self.allowed_roles(nil, project)
       end

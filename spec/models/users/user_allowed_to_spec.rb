@@ -51,12 +51,24 @@ describe User, 'allowed_to?' do
     describe "w/ the user being admin" do
 
       before do
-        user.admin = true
-        user.save!
+        user.update_attribute(:admin, true)
       end
 
       it "should be true" do
         user.allowed_to?(:add_work_packages, project).should be_true
+      end
+    end
+
+    describe "w/ the user being admin
+              w/ the project being archived" do
+
+      before do
+        user.update_attribute(:admin, true)
+        project.update_attribute(:status, Project::STATUS_ARCHIVED)
+      end
+
+      it "should be false" do
+        user.allowed_to?(:add_work_packages, project).should be_false
       end
     end
 
