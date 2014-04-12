@@ -32,7 +32,7 @@ module Authorization::Condition
     table Project
 
     def arel_statement(**ignored)
-      Project.active.where_values.first
+      projects[:status].eq(::Project::STATUS_ACTIVE)
     end
   end
 end
