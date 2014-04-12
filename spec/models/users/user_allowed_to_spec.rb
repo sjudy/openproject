@@ -72,6 +72,19 @@ describe User, 'allowed_to?' do
       end
     end
 
+    describe "w/ the user being admin
+              w/ the project module the permission belongs to being inactive" do
+
+      before do
+        user.update_attribute(:admin, true)
+        project.enabled_module_names = []
+      end
+
+      it "should be false" do
+        expect(user.allowed_to?(:add_work_packages, project)).to be_false
+      end
+    end
+
     describe "w/ the user being a member in the project
               w/o the role having the necessary permission" do
 
@@ -94,6 +107,37 @@ describe User, 'allowed_to?' do
 
       it "should be true" do
         user.allowed_to?(:add_work_packages, project).should be_true
+      end
+    end
+
+    describe "w/ the user being a member in the project
+              w/ the role having the necessary permission
+              w/o the module being active" do
+      before do
+        role.permissions << :view_news
+        project.enabled_module_names = []
+
+        member.save!
+      end
+
+      it "should be false" do
+        expect(user.allowed_to?(:view_news, project)).to be_false
+      end
+    end
+
+    describe "w/ the user being a member in the project
+              w/ the role having the necessary permission
+              w/ asking for a controller/action hash
+              w/o the module being active" do
+      before do
+        role.permissions << :view_news
+        project.enabled_module_names = []
+
+        member.save!
+      end
+
+      it "should be false" do
+        expect(user.allowed_to?({ controller: 'news', action: 'show' }, project)).to be_false
       end
     end
 

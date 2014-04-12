@@ -71,10 +71,13 @@ module User::Allowed
     end
 
     def allowed_to_in_project?(action, project, options = {})
+      active_actions = filter_inactive_actions(action, project)
+
       return false unless project.active?
+      return false if active_actions.empty?
       return true if self.admin?
 
-      allowed_in_context(action, project)
+      allowed_in_context(active_actions, project)
     end
 
     # Is the user allowed to do the specified action on any project?
@@ -105,6 +108,21 @@ module User::Allowed
 
     def allowance_cache
       @allowance_cache ||= ::User::AllowedCache.new
+    end
+
+    # Filters actions to only return those that:
+    # a) do not belong to a project module OR
+    # b) whoese project module is active in the project
+    def filter_inactive_actions(action, project)
+      action = Array(action)
+
+      action.select do |a|
+        perm = Redmine::AccessControl.permission(a)
+
+        perm.present? &&
+          !perm.project_module ||
+          project.enabled_module_names.include?(perm.project_module.to_s)
+      end
     end
   end
 
