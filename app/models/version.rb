@@ -52,7 +52,7 @@ class Version < ActiveRecord::Base
 
   scope :open, :conditions => {:status => 'open'}
 
-  needs_authorization view: :view_messages
+  needs_authorization view: :view_work_packages
 
   safe_attributes 'name',
     'description',

@@ -77,6 +77,7 @@ module Spec
             end
 
             it "should not be visible if user lacks the #{options[:permission]} permission in the project" do
+              member.save! unless permission.nil? || Redmine::AccessControl.permission(permission).public?
               instance
 
               expect(options[:klass].visible(user)).to match_array([])
@@ -93,6 +94,8 @@ module Spec
             end
 
             it "should be false if the user lacks the #{options[:permission]} permission in the project" do
+              member.save! unless permission.nil? || Redmine::AccessControl.permission(permission).public?
+
               expect(instance.visible?(user)).to be_false
             end
           end
@@ -116,6 +119,8 @@ module Spec
             end
 
             it "should not be editable if user lacks the #{options[:permission]} permission in the project" do
+              member.save! unless permission.nil? || Redmine::AccessControl.permission(permission).public?
+
               expect(instance.editable?(user)).to be_false
             end
 
@@ -161,6 +166,8 @@ module Spec
             end
 
             it "should not be deletable if user lacks the #{options[:permission]} permission in the project" do
+              member.save! unless permission.nil? || Redmine::AccessControl.permission(permission).public?
+
               expect(instance.deletable?(user)).to be_false
             end
 
