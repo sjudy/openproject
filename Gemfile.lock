@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/finnlabs/rspec-example_disabler.git
+  revision: deb9c38e3f4e3688724583ac1ff58e1ae8aba409
+  branch: master
+  specs:
+    rspec-example_disabler (0.0.1)
+
+GIT
   remote: https://github.com/finnlabs/rack-protection.git
   revision: 5a7d1bd2f05ca75faf7909c8cc978732a0080898
   ref: 5a7d1bd
@@ -120,7 +127,7 @@ GEM
     delayed_job_active_record (0.3.3)
       activerecord (>= 2.1.0, < 4)
       delayed_job (~> 3.0)
-    diff-lcs (1.2.4)
+    diff-lcs (1.2.5)
     erubis (2.7.0)
     eventmachine (1.0.3)
     execjs (1.4.0)
@@ -155,6 +162,7 @@ GEM
     guard-test (1.0.0)
       guard (>= 1.8)
       test-unit (~> 2.2)
+    hashie (2.0.5)
     hike (1.2.3)
     htmldiff (0.0.1)
     i18n (0.6.5)
@@ -189,13 +197,16 @@ GEM
     mime-types (1.25.1)
     mocha (0.13.3)
       metaclass (~> 0.0.1)
-    multi_json (1.8.2)
+    multi_json (1.9.2)
     multi_test (0.0.2)
     mysql2 (0.3.11)
     net-ldap (0.2.2)
     nokogiri (1.5.9)
     object-daddy (1.1.1)
     oj (2.1.6)
+    omniauth (1.2.1)
+      hashie (>= 1.2, < 3)
+      rack (~> 1.0)
     paper_trail (2.7.2)
       activerecord (~> 3.0)
       railties (~> 3.0)
@@ -265,23 +276,22 @@ GEM
       json (~> 1.4)
     ref (1.0.5)
     request_store (1.0.5)
-    rspec (2.13.0)
-      rspec-core (~> 2.13.0)
-      rspec-expectations (~> 2.13.0)
-      rspec-mocks (~> 2.13.0)
-    rspec-core (2.13.1)
-    rspec-example_disabler (0.0.1)
-    rspec-expectations (2.13.0)
+    rspec (2.14.1)
+      rspec-core (~> 2.14.0)
+      rspec-expectations (~> 2.14.0)
+      rspec-mocks (~> 2.14.0)
+    rspec-core (2.14.8)
+    rspec-expectations (2.14.5)
       diff-lcs (>= 1.1.3, < 2.0)
-    rspec-mocks (2.13.1)
-    rspec-rails (2.13.2)
+    rspec-mocks (2.14.6)
+    rspec-rails (2.14.2)
       actionpack (>= 3.0)
+      activemodel (>= 3.0)
       activesupport (>= 3.0)
       railties (>= 3.0)
-      rspec-core (~> 2.13.0)
-      rspec-expectations (~> 2.13.0)
-      rspec-mocks (~> 2.13.0)
-    ruby-openid (2.2.3)
+      rspec-core (~> 2.14.0)
+      rspec-expectations (~> 2.14.0)
+      rspec-mocks (~> 2.14.0)
     ruby-prof (0.13.0)
     ruby-progressbar (1.2.0)
     rubytree (0.8.3)
@@ -394,6 +404,7 @@ DEPENDENCIES
   net-ldap (~> 0.2.2)
   object-daddy (~> 1.1.0)
   oj
+  omniauth
   pg (~> 0.17.1)
   prototype-rails
   prototype_legacy_helper (= 0.0.0)!
@@ -413,10 +424,9 @@ DEPENDENCIES
   rb-readline
   rdoc (>= 2.4.2)
   request_store
-  rspec (~> 2.0)
-  rspec-example_disabler
-  rspec-rails (~> 2.0)
-  ruby-openid (~> 2.2.3)
+  rspec (~> 2.14)
+  rspec-example_disabler!
+  rspec-rails (~> 2.14)
   ruby-prof
   ruby-progressbar
   rubytree (~> 0.8.3)
@@ -425,7 +435,7 @@ DEPENDENCIES
   selenium-webdriver
   shoulda
   shoulda-matchers
-  simplecov (>= 0.8.pre)
+  simplecov (= 0.8.0.pre)
   sqlite3
   strong_parameters
   svg-graph

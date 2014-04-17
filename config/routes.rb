@@ -47,26 +47,18 @@ OpenProject::Application.routes.draw do
     get '/account/force_password_change', :action => 'force_password_change'
     post '/account/change_password', :action => 'change_password'
     get '/account/lost_password', :action => 'lost_password'
+
+    # omniauth routes
+    match '/auth/:provider/callback', :action => 'omniauth_login',
+                                     :as => 'omniauth_login',
+                                     :via => [:get, :post]
+    get '/auth/failure', action: 'omniauth_failure'
+
     match '/login', :action => 'login',  :as => 'signin', :via => [:get, :post]
     get '/logout', :action => 'logout', :as => 'signout'
   end
 
   namespace :api do
-
-    namespace :v1 do
-      resources :issues
-      resources :news
-      resources :projects do
-        collection do
-          get :level_list
-        end
-
-        resources :issues
-        resources :news
-      end
-      resources :time_entries, :controller => 'timelog'
-      resources :users
-    end
 
     namespace :v2 do
 
@@ -98,6 +90,10 @@ OpenProject::Application.routes.draw do
           get :planning_element_custom_fields
         end
         resources :workflows, only: [:index]
+
+        collection do
+          get :level_list
+        end
       end
 
       resources :custom_fields
@@ -146,9 +142,9 @@ OpenProject::Application.routes.draw do
 
   get   'projects/:project_id/wiki/new' => 'wiki#new', :as => 'wiki_new'
   post  'projects/:project_id/wiki/new' => 'wiki#create', :as => 'wiki_create'
-  post  'projects/:project_id/wiki/preview' => 'wiki#preview', :as => 'wiki_preview'
   get   'projects/:project_id/wiki/:id/new' => 'wiki#new_child', :as => 'wiki_new_child'
   get   'projects/:project_id/wiki/:id/toc' => 'wiki#index', :as => 'wiki_page_toc'
+  post  'projects/:project_id/wiki/preview' => 'wiki#preview', as: 'preview_wiki'
   post  'projects/:id/wiki' => 'wikis#edit'
   match 'projects/:id/wiki/destroy' => 'wikis#destroy'
 
@@ -206,11 +202,7 @@ OpenProject::Application.routes.draw do
     # this could probably be rewritten with a resource :as => 'roadmap'
     match '/roadmap' => 'versions#index', :via => :get
 
-    resources :news, :only => [:index, :new, :create] do
-      collection do
-        resource :preview, :controller => "news/previews", :only => [:create], :as => "news_preview"
-      end
-    end
+    resources :news, :only => [:index, :new, :create]
 
     namespace :time_entries do
       resource :report, :controller => 'reports', :only => [:show]
@@ -232,12 +224,12 @@ OpenProject::Application.routes.draw do
         get :parent_page, :action => 'edit_parent_page'
         put :parent_page, :action => 'update_parent_page'
         get :history
-        post :preview
         post :protect
         post :add_attachment
         get  :list_attachments
         get :select_main_menu_item, to: 'wiki_menu_items#select_main_menu_item'
         post :replace_main_menu_item, to: 'wiki_menu_items#replace_main_menu_item'
+        post :preview
       end
     end
     # as routes for index and show are swapped
@@ -252,7 +244,6 @@ OpenProject::Application.routes.draw do
 
     resources :work_packages, :only => [:new, :create, :index] do
       get :new_type, :on => :collection
-      put :preview, :on => :collection
 
       collection do
         match '/report/:detail' => 'work_packages/reports#report_details', :via => :get
@@ -352,7 +343,6 @@ OpenProject::Application.routes.draw do
 
   resources :work_packages, :only => [:show, :edit, :update, :index] do
     get :new_type, :on => :member
-    put :preview, :on => :member
 
     resources :relations, :controller => 'work_package_relations', :only => [:create, :destroy]
 
@@ -367,6 +357,9 @@ OpenProject::Application.routes.draw do
       resource :report, :controller => 'reports'
     end
     resources :time_entries, :controller => 'timelog'
+
+    post :preview, on: :collection
+    post :preview, on: :member
   end
 
   resources :versions, :only => [:show, :edit, :update, :destroy] do
@@ -403,22 +396,22 @@ OpenProject::Application.routes.draw do
 
   resources :boards, :only => [] do
     resources :topics, :controller => 'messages', :except => [:index], :shallow => true do
-      collection do
-        post :preview
-      end
 
       member do
         get :quote
         post :reply, :as => 'reply_to'
         post :preview
       end
+
+      post :preview, on: :collection
     end
   end
 
   resources :news, :only => [:index, :destroy, :update, :edit, :show] do
     resources :comments, :controller => 'news/comments', :only => [:create, :destroy], :shallow => true
 
-    resource :preview, :controller => 'news/previews', :only => [:create]
+    post :preview, on: :member
+    post :preview, on: :collection
   end
 
 
@@ -449,6 +442,8 @@ OpenProject::Application.routes.draw do
   scope :controller => 'my' do
     get '/my/password', :action => 'password'
     post '/my/change_password', :action => 'change_password'
+    match '/my/first_login', :action => 'first_login', :via => [:get, :put]
+    get '/my/page', :action => 'page'
   end
 
   get 'authentication' => 'authentication#index'
@@ -490,6 +485,5 @@ OpenProject::Application.routes.draw do
   # Install the default route as the lowest priority.
   match '/:controller(/:action(/:id))'
   match '/robots' => 'welcome#robots', :defaults => { :format => :txt }
-  # Used for OpenID
   root :to => 'account#login'
 end

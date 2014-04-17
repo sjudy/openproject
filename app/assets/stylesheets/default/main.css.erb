@@ -27,8 +27,6 @@ See doc/COPYRIGHT.rdoc for more details.
 
 ++*/
 
-input#openid_url { background: url(<%= asset_path 'openid-bg.gif' %>) no-repeat; background-color: #fff; background-position: 0 50%; padding-left: 18px; }
-
 .clear:after{ content: "."; display: block; height: 0; clear: both; visibility: hidden; }
 
 /***** Tables *****/
@@ -1076,14 +1074,14 @@ table.files {
   display: block;
 }
 #content blockquote, .wiki ol, .wiki ul {
-  padding-left: 9px;
+  padding-left: 22px;
 }
 .wiki p {
   margin-bottom: 5px;
 }
 blockquote {
   font-style: italic;
-  background: url(<%= asset_path 'blockquote-bg.png' %>) no-repeat 25px 3px;
+  background: url(<%= asset_path 'blockquote-bg.png' %>) no-repeat 5px 3px;
 }
 .wiki ul li {
   list-style: disc inside none;
@@ -1850,4 +1848,8 @@ h4.comment img {
 .atwho-view .cur {
   background: #FFFFBB;
   color: #4B4B4B;
+}
+
+.atwho-view .cur strong {
+    color: black;
 }
