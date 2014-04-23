@@ -52,7 +52,7 @@ angular.module('openproject.messages', ['openproject.messages.controllers']);
 angular.module('openproject.messages.controllers', []);
 
 // main app
-var openprojectApp = angular.module('openproject', ['ui.select2', 'ui.date', 'openproject.uiComponents', 'openproject.timelines', 'openproject.workPackages', 'openproject.messages', 'ngAnimate']);
+var openprojectApp = angular.module('openproject', ['ui.select2', 'ui.date', 'openproject.uiComponents', 'openproject.timelines', 'openproject.workPackages', 'openproject.messages', 'ngAnimate', 'ngSanitize']);
 
 openprojectApp
   .config(['$locationProvider', '$httpProvider', function($locationProvider, $httpProvider) {
