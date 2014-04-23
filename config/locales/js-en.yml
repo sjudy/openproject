@@ -50,6 +50,8 @@ en:
     label_all: "all"
     label_all_work_packages: "all work packages"
     label_ascending: "Ascending"
+    label_board_locked: "Locked"
+    label_board_sticky: "Sticky"
     label_descending: "Descending"
     label_closed_work_packages: "closed"
     label_collapse: "Collapse"

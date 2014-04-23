@@ -30,7 +30,8 @@ object @message
 attributes :id,
            :subject,
            :created_on,
-           :replies_count
+           :replies_count,
+           :sticked_on
 
 node :author do |m|
   partial('users/show', object: m.author)
@@ -38,4 +39,12 @@ end
 
 node :last_reply, if: lambda { |m| m.last_reply } do |m|
   partial('messages/show', object: m.last_reply)
+end
+
+node :isSticky do |m|
+  m.sticky?
+end
+
+node :isLocked do |m|
+  m.locked?
 end

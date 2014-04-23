@@ -50,6 +50,8 @@ de:
     label_all: "alle"
     label_all_work_packages: "alle Arbeitspakete"
     label_ascending: "Aufsteigend"
+    label_board_locked: "Gesperrt"
+    label_board_sticky: "Wichtig (immer oben)"
     label_closed_work_packages: "geschlossen"
     label_collapse: "Zuklappen"
     label_collapsed: "zugeklappt"
