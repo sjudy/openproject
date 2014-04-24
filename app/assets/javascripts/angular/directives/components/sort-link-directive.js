@@ -26,10 +26,34 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-angular.module('openproject.messages.controllers')
+// TODO move to UI components
+angular.module('openproject.uiComponents')
 
-.controller('MessagesController', ['$scope', 'PathHelper', function ($scope, PathHelper) {
-  $scope.PathHelper = PathHelper;
-  $scope.messages = gon.messages;
-  $scope.predicate = "";
+.directive('sortLink', [function() {
+  return {
+    restrict: 'E',
+    transclude: true,
+    scope: { sortAttr: '@', sortPredicate: '=' },
+    templateUrl: '/templates/components/sort-link.html',
+    link: function(scope, element, attrs) {
+      scope.sortDirection = "";
+
+      scope.$watch('sortPredicate', function() {
+        if (scope.sortPredicate.indexOf(scope.sortAttr) < 0) {
+          scope.sortDirection = "";
+        }
+      });
+
+      scope.sort = function() {
+        var sortPrefix = '';
+        if (scope.sortDirection == 'asc') {
+          scope.sortDirection = 'desc';
+          sortPrefix = '-';
+        } else {
+          scope.sortDirection = 'asc';
+        }
+        scope.sortPredicate = sortPrefix + scope.sortAttr;
+      };
+    }
+  };
 }]);

@@ -59,15 +59,15 @@ See doc/COPYRIGHT.rdoc for more details.
 
 
 <% if @topics.any? %>
-<table class="list messages">
+<table class="list messages" ng-controller="MessagesController">
   <thead><tr>
     <th><%= Message.human_attribute_name(:subject) %></th>
     <th><%= Message.human_attribute_name(:author) %></th>
-    <%= sort_header_tag('created_on', :caption => Message.human_attribute_name(:created_on)) %>
-    <%= sort_header_tag('replies', :caption => l(:label_reply_plural)) %>
-    <%= sort_header_tag('updated_on', :caption => l(:label_message_last)) %>
+    <th><sort-link sort-attr="created_on" sort-predicate="predicate"><%= Message.human_attribute_name(:created_on) %></sort-link></th>
+    <th><sort-link sort-attr="replies_count" sort-predicate="predicate"><%= l(:label_reply_plural) %></sort-link></th>
+    <th><sort-link sort-attr="last_reply.created_on" sort-predicate="predicate"><%= l(:label_message_last) %></sort-link></th>
   </tr></thead>
-  <tbody ng-controller="MessagesController">
+  <tbody>
     <tr ng-repeat="message in messages | orderBy:['-sticked_on', predicate]">
       <td class="subject">
         <icon-wrapper ng-if="message.isLocked == true" icon-name="locked" icon-title="{{I18n.t('js.label_board_locked')}}"></icon-wrapper>
