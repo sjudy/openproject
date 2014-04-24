@@ -68,7 +68,7 @@ See doc/COPYRIGHT.rdoc for more details.
     <th><sort-link sort-attr="last_reply.created_on" sort-predicate="predicate"><%= l(:label_message_last) %></sort-link></th>
   </tr></thead>
   <tbody>
-    <tr ng-repeat="message in messages | orderBy:['-sticked_on', predicate]">
+    <tr ng-repeat="message in messages | orderBy:[filterByStickedOn, predicate]">
       <td class="subject">
         <icon-wrapper ng-if="message.isLocked == true" icon-name="locked" icon-title="{{I18n.t('js.label_board_locked')}}"></icon-wrapper>
         <img ng-if="message.isSticky == true" ng-src="{{PathHelper.assetPath('bullet_go.png')}}" alt="{{I18n.t('js.label_board_sticky')}}"></img>
