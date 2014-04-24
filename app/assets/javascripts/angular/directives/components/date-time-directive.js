@@ -40,7 +40,7 @@ angular.module('openproject.uiComponents')
 
       // TODO: The timezone of scope.time is UTC. Thus, we need to adapt the
       // time to the local timezone or user setting.
-      scope.time = moment.utc(scope.dateTime).format('LLL');
+      scope.time = moment(scope.dateTime, "MM/DD/YYYY/ HH:mm A").utc().format('LLL');
     }
   };
 }]);
