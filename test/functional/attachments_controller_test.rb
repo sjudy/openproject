@@ -87,7 +87,7 @@ class AttachmentsControllerTest < ActionController::TestCase
 
     get :show, :id => 4
     assert_response :success
-    assert_equal 'application/x-ruby', @response.content_type
+    assert_equal 'text/x-ruby', @response.content_type
   end
 
   def test_show_other
@@ -99,7 +99,7 @@ class AttachmentsControllerTest < ActionController::TestCase
   def test_download_text_file
     get :download, :id => 4
     assert_response :success
-    assert_equal 'application/x-ruby', @response.content_type
+    assert_equal 'text/x-ruby', @response.content_type
   end
 
   def test_download_should_assign_content_type_if_blank
@@ -107,7 +107,7 @@ class AttachmentsControllerTest < ActionController::TestCase
 
     get :download, :id => 4
     assert_response :success
-    assert_equal 'text/x-ruby', @response.content_type
+    assert_equal 'application/binary', @response.content_type
   end
 
   def test_download_missing_file

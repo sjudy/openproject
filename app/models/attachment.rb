@@ -36,11 +36,13 @@ class Attachment < ActiveRecord::Base
 
   attr_protected :author_id
 
-  validates_presence_of :container, :filename, :author
+  validates_presence_of :container, :filename, :author, :content_type
   validates_length_of :filename, :maximum => 255
   validates_length_of :disk_filename, :maximum => 255
 
   validate :filesize_below_allowed_maximum
+
+  after_initialize :set_default_content_type
 
   before_save :copy_file_to_destination
   after_destroy :delete_file_on_disk
@@ -70,12 +72,6 @@ class Attachment < ActiveRecord::Base
         if @temp_file.respond_to?(:original_filename)
           self.filename = @temp_file.original_filename
           self.filename.force_encoding("UTF-8") if filename.respond_to?(:force_encoding)
-        end
-        if @temp_file.respond_to?(:content_type)
-          self.content_type = @temp_file.content_type.to_s.chomp
-        end
-        if content_type.blank? && filename.present?
-          self.content_type = Redmine::MimeType.of(filename)
         end
         self.filesize = @temp_file.size
       end
@@ -115,10 +111,7 @@ class Attachment < ActiveRecord::Base
         end
       end
       self.digest = md5.hexdigest
-    end
-    # Don't save the content type if it's longer than the authorized length
-    if self.content_type && self.content_type.length > 255
-      self.content_type = nil
+      self.content_type = self.class.content_type_for(diskfile)
     end
   end
 
@@ -141,6 +134,10 @@ class Attachment < ActiveRecord::Base
     container.respond_to?(:project)? container.project : nil
   end
 
+  def content_disposition
+    inlineable? ? 'inline' : 'attachment'
+  end
+
   def visible?(user=User.current)
     container.attachments_visible?(user)
   end
@@ -149,21 +146,37 @@ class Attachment < ActiveRecord::Base
     container.attachments_deletable?(user)
   end
 
-  def image?
-    self.filename =~ /\.(jpe?g|gif|png)\z/i
+  # images and pdfs are sent inline
+  def inlineable?
+    is_image? || is_pdf?
+  end
+
+  def is_image?
+    content_type =~ /\Aimage\/.+/
+  end
+
+  # backwards compatibility for plugins
+  alias :image? :is_image?
+
+  def is_pdf?
+    content_type == 'application/pdf'
   end
 
   def is_text?
-    Redmine::MimeType.is_type?('text', filename)
+    content_type =~ /\Atext\/.+/
   end
 
   def is_diff?
-    self.filename =~ /\.(patch|diff)\z/i
+    is_text? && self.filename =~ /\.(patch|diff)\z/i
   end
 
   # Returns true if the file is readable
   def readable?
     File.readable?(diskfile)
+  end
+
+  def set_default_content_type
+    self.content_type = OpenProject::ContentTypeDetector::SENSIBLE_DEFAULT if content_type.blank?
   end
 
   # Bulk attaches a set of files to an object
@@ -191,6 +204,10 @@ class Attachment < ActiveRecord::Base
       end
     end
     {:files => attached, :unsaved => obj.unsaved_attachments}
+  end
+
+  def self.content_type_for(file_path)
+    Redmine::MimeType.narrow_type(file_path, OpenProject::ContentTypeDetector.new(file_path).detect)
   end
 
 private
