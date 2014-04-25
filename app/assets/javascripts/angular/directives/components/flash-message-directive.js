@@ -26,33 +26,20 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-angular.module('openproject.timeEntries.controllers')
+// TODO move to UI components
+angular.module('openproject.uiComponents')
 
-.controller('TimeEntriesController', ['$scope', '$rootScope', '$http', 'PathHelper', function ($scope, $rootScope, $http, PathHelper) {
-  $scope.PathHelper = PathHelper;
-  $scope.timeEntries = gon.timeEntries;
-  $scope.predicate = "";
-
-  $scope.deleteTimeEntry = function(id) {
-    if (window.confirm(I18n.t('js.text_are_you_sure'))) {
-      $http.delete(PathHelper.timeEntryPath(id))
-           .success(function(data, status, headers, config) {
-             var index = 0;
-
-             for (var i = 0; i < $scope.timeEntries.length; i++) {
-               if ($scope.timeEntries[i].id == id) {
-                 index = i;
-                 break;
-               }
-             }
-
-             $scope.timeEntries.splice(index, 1);
-
-             $scope.$emit('flashMessage', data);
-           })
-           .error(function(data, status, headers, config) {
-             $scope.$emit('flashMessage', data);
-           });
+.directive('flashMessage', ['$rootScope', function($rootScope) {
+  return {
+    restrict: 'E',
+    replace: true,
+    scope: { },
+    templateUrl: '/templates/components/flash_message.html',
+    link: function(scope, element, attrs) {
+      $rootScope.$on('flashMessage', function(event, message) {
+        scope.message = message;
+        activateError();
+      });
     }
   };
 }]);
