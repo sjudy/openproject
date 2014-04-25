@@ -34,7 +34,7 @@ angular.module('openproject.uiComponents')
     restrict: 'E',
     transclude: true,
     scope: { sortAttr: '@', sortPredicate: '=' },
-    templateUrl: '/templates/components/sort-link.html',
+    templateUrl: '/templates/components/sort_link.html',
     link: function(scope, element, attrs) {
       scope.sortDirection = "";
 
