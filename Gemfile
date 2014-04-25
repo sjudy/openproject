@@ -95,7 +95,7 @@ gem 'daemons'
 # (see https://www.openproject.org/work_packages/3029)
 gem 'rack-protection', :git => "https://github.com/finnlabs/rack-protection.git", :ref => '5a7d1bd'
 
-gem 'syck', :platforms => [:ruby_20, :mingw_20, :ruby_21, :mingw_21], :require => false
+gem 'syck', :require => false
 
 gem 'gon', '~> 4.0'
 
@@ -163,47 +163,19 @@ group :development do
   gem 'pry-rails'
   gem 'pry-stack_explorer'
   gem 'pry-rescue'
-  gem 'pry-byebug', :platforms => [:mri_20,:mri_21]
+  gem 'pry-byebug'
   gem 'pry-doc'
   gem 'rails-dev-tweaks', '~> 0.6.1'
   gem 'thin'
   gem 'faker'
 end
 
-# Use the commented pure ruby gems, if you have not the needed prerequisites on
-# board to compile the native ones.  Note, that their use is discouraged, since
-# their integration is propbably not that well tested and their are slower in
-# orders of magnitude compared to their native counterparts. You have been
-# warned.
-
-platforms :mri, :mingw do
-  group :mysql2 do
-    gem "mysql2", "~> 0.3.11"
-  end
-
-  group :postgres do
-    gem 'pg', "~> 0.17.1"
-  end
-
-  group :sqlite do
-    gem "sqlite3"
-  end
+group :mysql2 do
+  gem "mysql2", "~> 0.3.11"
 end
 
-platforms :jruby do
-  gem "jruby-openssl"
-
-  group :mysql do
-    gem "activerecord-jdbcmysql-adapter"
-  end
-
-  group :postgres do
-    gem "activerecord-jdbcpostgresql-adapter"
-  end
-
-  group :sqlite do
-    gem "activerecord-jdbcsqlite3-adapter"
-  end
+group :postgres do
+  gem 'pg', "~> 0.17.1"
 end
 
 # Load Gemfile.local, Gemfile.plugins and plugins' Gemfiles
