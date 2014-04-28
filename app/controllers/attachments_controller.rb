@@ -49,9 +49,14 @@ class AttachmentsController < ApplicationController
       @attachment.increment_download
     end
 
+    # browsers should not try to guess the content-type
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+
+    @attachment.content_type = detect_content_type(@attachment)
+
     # images are sent inline
     send_file @attachment.diskfile, :filename => filename_for_content_disposition(@attachment.filename),
-                                    :type => detect_content_type(@attachment),
+                                    :type => @attachment.content_type,
                                     :disposition => (@attachment.image? ? 'inline' : 'attachment')
 
   end
@@ -91,11 +96,22 @@ private
   end
 
   def detect_content_type(attachment)
-    content_type = attachment.content_type
-    if content_type.blank?
-      content_type = Redmine::MimeType.of(attachment.filename)
+    content_type = type_from_file_command(attachment.diskfile)
+    Redmine::MimeType.narrow_type(attachment.filename, content_type)
+  end
+
+  def type_from_file_command(filename)
+    type = begin
+      # On BSDs, `file` doesn't give a result code of 1 if the file doesn't exist.
+      Cocaine::CommandLine.new("file", "-b --mime :file").run(file: filename)
+    rescue Cocaine::CommandLineError
+      'application/binary'
     end
-    content_type.to_s
+
+    if type.nil? || type.match(/\(.*?\)/)
+      type = 'application/binary'
+    end
+    type.split(/[:;\s]+/)[0]
   end
 
   def destroy_response_url(container)
