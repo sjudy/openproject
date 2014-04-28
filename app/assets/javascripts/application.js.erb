@@ -1259,8 +1259,6 @@ var I18nForms = (function ($) {
   };
 }(jQuery));
 
-jQuery(document).ready(I18nForms.init);
-
 var activateFlash = function(query) {
   var flashMessages = jQuery('.flash');
 
@@ -1290,6 +1288,8 @@ var activateFlashError = function () {
 }
 
 var setupServerResponse = function() {
+  I18nForms.init();
+  initMainMenuExpandStatus();
   activateFlashNotice();
   activateFlashError();
 
@@ -1297,7 +1297,6 @@ var setupServerResponse = function() {
   jQuery(document).ajaxComplete(activateFlashError);
 }
 
-jQuery(document).ready(initMainMenuExpandStatus);
 jQuery(document).ready(setupServerResponse);
 
 var SubmitConfirm = (function($) {
