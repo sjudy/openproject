@@ -26,33 +26,64 @@
 // See doc/COPYRIGHT.rdoc for more details.
 //++
 
-// TODO move to UI components
 angular.module('openproject.uiComponents')
 
-.directive('sortLink', [function() {
+.directive('sortLink', ['I18n', function(I18n) {
   return {
     restrict: 'E',
     transclude: true,
     scope: { sortAttr: '@', sortPredicate: '=' },
     templateUrl: '/templates/components/sort_link.html',
     link: function(scope, element, attrs) {
-      scope.sortDirection = "";
+      var getSortTitle = function() {
+        var title = "";
+        var attribute = angular.element(element[0]).find('span.ng-scope').text();
+
+        if (scope.sortPredicate.indexOf(scope.sortAttr) >= 0) {
+          if (scope.sortPredicate.indexOf('-') >= 0) {
+            title = I18n.t('js.label_descending');
+          } else {
+            title = I18n.t('js.label_ascending');
+          }
+
+          title += ' ' + I18n.t('js.label_sorted_by') + ' ' + attribute;
+        } else {
+          title = I18n.t('js.label_sort_by') + ' ' + attribute;
+        }
+
+        return title;
+      }
+
+      var getSortCss = function() {
+        var sortDirection = 'asc';
+
+        if (scope.sortPredicate.indexOf('-') >= 0) {
+          sortDirection = 'desc';
+        }
+
+        return sortDirection;
+      }
+
+      scope.sortDirection = getSortCss();
+      scope.sortTitle = getSortTitle();
 
       scope.$watch('sortPredicate', function() {
         if (scope.sortPredicate.indexOf(scope.sortAttr) < 0) {
           scope.sortDirection = "";
+          scope.sortTitle = getSortTitle();
         }
       });
 
       scope.sort = function() {
-        var sortPrefix = '';
-        if (scope.sortDirection == 'asc') {
-          scope.sortDirection = 'desc';
-          sortPrefix = '-';
-        } else {
-          scope.sortDirection = 'asc';
+        var sortPrefix = '-';
+
+        if (scope.sortPredicate.indexOf('-') >= 0) {
+          sortPrefix = '';
         }
+
         scope.sortPredicate = sortPrefix + scope.sortAttr;
+        scope.sortDirection = getSortCss();
+        scope.sortTitle = getSortTitle();
       };
     }
   };
