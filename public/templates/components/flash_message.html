@@ -1,8 +1,3 @@
-<div ng-if="message !== undefined">
-  <div ng-if="message.isError === undefined || !message.isError" style="display:block" class="flash notice icon icon-notice" role="alert">
-    {{message.text}}
-  </div>
-  <div ng-if="message.isError" style="display:block" class="errorExplanation" id="errorExplanation" role="alert">
-    {{message.text}}
-  </div>
+<div ng-if="message !== undefined" style="display:block" ng-class="flashClass" id="{{flashId}}" role="alert">
+  {{message.text}}
 </div>

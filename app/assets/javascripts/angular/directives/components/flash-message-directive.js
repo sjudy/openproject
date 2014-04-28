@@ -38,6 +38,14 @@ angular.module('openproject.uiComponents')
     link: function(scope, element, attrs) {
       $rootScope.$on('flashMessage', function(event, message) {
         scope.message = message;
+        scope.flashClass = "flash notice icon icon-notice";
+        scope.flashId = "";
+
+        if (message.isError) {
+          scope.flashClass = "errorExplanation";
+          scope.flashId = "errorExplanation";
+        }
+
         activateError();
       });
     }
